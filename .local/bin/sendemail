@@ -1,0 +1,14 @@
+#!/bin/sh
+
+command_exists () {
+  # https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then
+  # https://unix.stackexchange.com/questions/86012/what-is-the-purpose-of-the-hash-command
+  command -v "$1" > /dev/null 2>&1
+  return $?
+}
+
+user_arg=""
+container_dir="/home/user"
+(! command_exists docker) && command_exists podman && alias docker=podman && user_arg="-u 0:0" && container_dir="/root"
+
+docker run -i  $user_arg -v "${HOME}"/Mail:$container_dir git.lerch.org/lobo/msmtp-enqueue:1 "$@"

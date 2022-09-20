@@ -1,0 +1,55 @@
+# About Me
+set realname = 'Emil Lerch'
+set from = 'lobo@lerch.org'
+set use_from = yes
+set envelope_from = yes
+
+# We won't use imap here - Maildir instead
+# My mailboxes
+# set folder = 'imaps://imap.gmail.com:993'
+set mbox_type=Maildir
+set folder = "~/Mail/gmail"
+set spoolfile = '+Inbox'
+set postponed = '+[Gmail]/Drafts'
+set record = '+[Gmail]/Sent Mail'
+unset record # Gmail automatically saves sent e-mail to +[Gmail]/Sent, so we do not want duplicates
+set trash = '+[Gmail]/Trash'
+set ssl_force_tls = yes
+set sendmail = "sendemail"
+unset record
+
+
+# Where to put the stuff
+set header_cache     = ~/.mutt/cache/headers # store headers
+set message_cachedir = ~/.mutt/cache/bodies  # store bodies
+# set certificate_file = ~/.mutt/certificates  # store certs (touch file)
+
+# Other
+source mutt-colors-solarized-dark-256.muttrc
+set read_inc=1000
+set write_inc=1000
+set sort=threads
+set sort_aux=reverse-last-date-received
+set date_format="%Y-%m-%d %T"
+set index_format="%2C | %Z [%d] %-30.30F (%-4.4c) %s"
+set forward_format="Fwd: %s"
+set mime_forward=yes
+#set new_mail_command = "notify-send '%d' '%n new messages, %u unread'"
+set new_mail_command = "gdbus call --session --dest=org.freedesktop.Notifications --object-path=/org/freedesktop/Notifications --method=org.freedesktop.Notifications.Notify '' 0 '' '%d' '%n new messages' '[]' '{\"urgency\": <1>}' 5000"
+set signature=""
+auto_view text/html
+
+unset imap_passive # is this necessary?
+
+# Use mousewheel
+bind pager <down> next-line
+bind pager <up> previous-line
+# TODO
+# https://wiki.archlinux.org/title/Mutt
+# Set up khard
+# Look at mailcap: https://gist.github.com/Konfekt/9797372146e65a70a44c1e24a35ae0a2
+#                  https://jasonwryan.com/blog/2012/05/12/mutt/
+# Review this stuff:
+#   https://hobo.house/2016/08/08/switching-from-mutt-to-neomutt/
+#   https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
+

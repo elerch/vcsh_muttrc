@@ -1,0 +1,62 @@
+
+# About Me
+set realname = 'Emil Lerch'
+set from = 'lobo@lerch.org'
+set use_from = yes
+set envelope_from = yes
+
+set smtp_url = 'smtp://lobo@lerch.org@smtp.gmail.com:587/'
+
+# Super useful:
+# http://www.dcs.gla.ac.uk/~jacobd/posts/2022/03/configure-mutt-to-work-with-oauth-20/
+set imap_user = 'lobo@lerch.org'
+# set imap_authenticators = "oauthbearer:xoauth2"
+set imap_authenticators = "oauthbearer"
+set imap_oauth_refresh_command = "mutt_oauth2.py ~/.config/google_oauth2_token_file"
+set smtp_authenticators = ${imap_authenticators}
+set smtp_oauth_refresh_command = ${imap_oauth_refresh_command}
+set imap_keepalive = 60
+
+# My mailboxes
+set folder = 'imaps://imap.gmail.com:993'
+set spoolfile = '+INBOX'
+set postponed = '+[Gmail]/Drafts'
+set record = '+[Gmail]/Sent Mail'
+unset record # Gmail automatically saves sent e-mail to +[Gmail]/Sent, so we do not want duplicates
+set trash = '+[Gmail]/Trash'
+set ssl_force_tls = yes
+
+# Check for new mail
+mailboxes +INBOX
+set timeout = 60 # check for new mail once per minute
+
+# Where to put the stuff
+set header_cache     = ~/.mutt/cache/headers # store headers
+set message_cachedir = ~/.mutt/cache/bodies  # store bodies
+set certificate_file = ~/.mutt/certificates  # store certs (touch file)
+
+# Other
+source mutt-colors-solarized-dark-256.muttrc
+set sort=threads
+set sort_aux=reverse-last-date-received
+set date_format="%Y-%m-%d %T"
+set index_format="%2C | %Z [%d] %-30.30F (%-4.4c) %s"
+set forward_format="Fwd: %s"
+set mime_forward=yes
+set signature=""
+auto_view text/html
+
+unset imap_passive # is this necessary?
+
+# Use mousewheel
+bind pager <down> next-line
+bind pager <up> previous-line
+# TODO
+# https://wiki.archlinux.org/title/Mutt
+# Set up khard
+# Look at mailcap: https://gist.github.com/Konfekt/9797372146e65a70a44c1e24a35ae0a2
+#                  https://jasonwryan.com/blog/2012/05/12/mutt/
+# Review this stuff:
+#   http://talau.info/post/my-muttrc-with-multiple-imap-accounts/
+#   https://hobo.house/2016/08/08/switching-from-mutt-to-neomutt/
+#   https://hobo.house/2015/09/09/take-control-of-your-email-with-mutt-offlineimap-notmuch/
