@@ -11,4 +11,4 @@ user_arg=""
 container_dir="/home/user"
 (! command_exists docker) && command_exists podman && alias docker=podman && user_arg="-u 0:0" && container_dir="/root"
 
-docker run -i  $user_arg -v "${HOME}"/Mail:$container_dir git.lerch.org/lobo/msmtp-enqueue:1 "$@"
+docker run --rm -i  $user_arg -v "${HOME}"/Mail:$container_dir git.lerch.org/lobo/msmtp-enqueue:1 "$@"
