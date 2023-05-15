@@ -1,2 +1,2 @@
-text/html;                         w3m -I %{charset} -T text/html -o display_link_number=1 -dump; copiousoutput
+text/html;                         w3m -I %{charset} -T text/html -cols 140 -o display_link_number=1 -dump; copiousoutput
 application/pdf;                   xdg-open %s; copiousoutput
