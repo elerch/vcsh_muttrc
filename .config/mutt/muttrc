@@ -75,15 +75,15 @@ macro attach 'V' "<pipe-entry>iconv -c --to-code=UTF8 > ~/.cache/mutt-mail.html<
 ifndef my_has_nerd finish # end here if we don't have nerd fonts installed
 # Default is:
 # "-%r-NeoMutt: %D [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%?T?%T/?%s/%S)-%>-(%P)---"
-set status_format = "%r %D %?u? %u ?%?R? %R ?%?d? %d ?%?t? %t ?%?F? %F ?%?p? %p? \n  \n"
+set status_format = "%r %D %?u? %u ?%?R?󰇯 %R ?%?d? %d ?%?t? %t ?%?F? %F ?%?p? %p? \n  \n"
 
 # not addressed to me, to me, group, cc, sent by me, mailing list
 set to_chars=" "
 
 # unchanged mailbox, changed, read only, attach mode
-set status_chars = " "
+set status_chars = " 󰍁󰁦"
 ifdef crypt_chars set crypt_chars = " "
-set flag_chars = "     "
+set flag_chars = " 󰎔    "
 
 # Statusbar Colors   ----------------------------------------------------------------
 color status color141 default
@@ -95,7 +95,7 @@ color status color8 default '(|)'                      # statusline "bubbl
 color status color69 black '(\` )'                      # bubble account variation
 color status white color69 '([a-zA-Z0-9\.]+)( )'         # account text
 color status green color8 ''                            # Unread messages count
-color status blue color8 ''                             # Read messages count icon
+color status blue color8 '󰇯'                             # Read messages count icon
 color status yellow color8 ''                           # Flagged icon
 color status red color8 ''                              # Pending delete icon
 

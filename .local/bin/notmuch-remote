@@ -1,2 +1,2 @@
 #!/bin/sh
-ssh nas2 docker run --rm -v /data/mail/lobo/gmail:/Mail -v /home/lobo/notmuch:/notmuch -v /home/lobo/notmuch/.notmuch-config:/home/user/.notmuch-config:ro git.lerch.org/lobo/notmuch:1 "$@"
+ssh nas2.local docker run --rm -v /data/mail/lobo/gmail:/Mail -v /home/lobo/notmuch:/notmuch -v /home/lobo/notmuch/.notmuch-config:/home/user/.notmuch-config:ro git.lerch.org/lobo/notmuch:1 "$@"
