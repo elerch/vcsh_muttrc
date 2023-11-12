@@ -18,6 +18,11 @@ set ssl_force_tls = yes
 set sendmail = "sendemail"
 unset record
 
+# Move these folders outside of gmail
+set record = '~/Mail/gmail/Inbox/.Sent'
+set trash = '~/Mail/gmail/Inbox/.Trash'
+set postponed = '~/Mail/gmail/Inbox/.Drafts'
+
 # Where to put the stuff
 set header_cache     = ~/.mutt/cache/headers # store headers
 set message_cachedir = ~/.mutt/cache/bodies  # store bodies
