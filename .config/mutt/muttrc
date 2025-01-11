@@ -21,9 +21,9 @@ set sendmail = "sendemail"
 unset record
 
 # Move these folders outside of gmail
-set record = '~/Mail/gmail/Inbox/.Sent'
-set trash = '~/Mail/gmail/Inbox/.Trash'
-set postponed = '~/Mail/gmail/Inbox/.Drafts'
+set record = '=Inbox/.Sent'
+set trash = '=Inbox/.Trash'
+set postponed = '=Inbox/.Drafts'
 
 # Where to put the stuff
 set header_cache     = ~/.mutt/cache/headers # store headers
