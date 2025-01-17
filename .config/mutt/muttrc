@@ -82,7 +82,11 @@ macro attach 'V' "<pipe-entry>iconv -c --to-code=UTF8 > ~/.cache/mutt-mail.html<
 ifndef my_has_nerd finish # end here if we don't have nerd fonts installed
 # Default is:
 # "-%r-NeoMutt: %D [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%?T?%T/?%s/%S)-%>-(%P)---"
-set status_format = "%r %D %?u? %u ?%?R?󰇯 %R ?%?d? %d ?%?t? %t ?%?F? %F ?%?p? %p? \n  \n"
+set status_format = "%r 📫%D %?u? %u ?%?R?󰇯 %R ?%?d? %d ?%?t? %t ?%?F? %F ?%?p? %p? \n  \n"
+
+# This is the default. Pager format is what you see when looking at the mail message
+# set pager_format = "-%Z- %C/%m: %-20.20n   %s%*  -- (%P)"
+set pager_format = "⯐%Z   %C/%m 👤 %-20.20n  📝 %s​%* %P"
 
 # not addressed to me, to me, group, cc, sent by me, mailing list
 set to_chars=" "
@@ -94,15 +98,27 @@ set flag_chars = " 󰎔    "
 
 # Statusbar Colors   ----------------------------------------------------------------
 color status color141 default
-color status color7 color8 '([a-zA-Z0-9\.,]|\[|\])(\s)'  # bubble content 1
-color status color7 color8 '(\s)([a-zA-Z0-9\.,]|\[|\])'  # bubble content 2
+color status color11 color241 '([=a-zA-Z0-9\.,]+|\[|\])(\s)'  # bubble content 1
+color status color7 color241 '(\s)([=a-zA-Z0-9\.,]+|\[|\])'  # bubble content 2
 color status color7 color8 '(\% )'                       # % symbol
-color status color7 color8 '(\S)'                        # empty spaces
-color status color8 default '(|)'                      # statusline "bubbles"
-color status color69 black '(\` )'                      # bubble account variation
-color status white color69 '([a-zA-Z0-9\.]+)( )'         # account text
-color status green color8 ''                            # Unread messages count
-color status blue color8 '󰇯'                             # Read messages count icon
-color status yellow color8 ''                           # Flagged icon
-color status red color8 ''                              # Pending delete icon
+# This breaks stuff and I'm not sure why it's here
+# color status color7 color8 '(\S)'                        # empty spaces
+color status color241 default '(|)'                      # statusline "bubbles"
+# Mailbox description. Note I needed to add mailbox icon as an anchor as there
+# are many, many possible characters
+color status color7 color241 '📫=?[a-zA-Z0-9\/\. ]+'  # Mailbox description (this is probably wrong)
 
+color status white color69 '([a-zA-Z0-9\.]+)( )'           # account text (not applicable)
+color status green color241 ''                            # Unread messages count
+color status blue color241 '󰇯'                             # Read messages count icon
+color status yellow color241 ''                           # Flagged icon
+color status red color241 ''                              # Pending delete icon
+color status black color241 ''                            # Draft icon
+
+# Pager formatting
+color status magenta color241 '⯐...  '                     # Status icons (left side)
+color status color11   color241 '[0-9]+/[0-9]+'              # Location of message in index
+color status color76 color241 '👤 .{20}'                    # Author, which is exactly 20 characters
+# color status color21 color241 '📝 .+​'                 # Subject
+color status color81 color241 '📝 .+​'                 # Subject
+color status yellow color241 '[0-9]+%'                    # Place in message (right side)
