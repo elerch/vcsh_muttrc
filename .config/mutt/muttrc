@@ -98,6 +98,7 @@ set flag_chars = " 󰎔    "
 
 # Statusbar Colors   ----------------------------------------------------------------
 color status color141 default
+color status color11 color241 '---Attachment: .*'             # Attachment screens
 color status color11 color241 '([=a-zA-Z0-9\.,]+|\[|\])(\s)'  # bubble content 1
 color status color7 color241 '(\s)([=a-zA-Z0-9\.,]+|\[|\])'  # bubble content 2
 color status color7 color8 '(\% )'                       # % symbol
