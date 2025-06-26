@@ -1,10 +1,10 @@
 # The first one here is triggered when going in to view the attachments, then pressing 'm' on the text/html
 # -sixel changes w3m behavior a bit. Without it, images will show up, but only when you do something to the screen
 # having the option shows the images immediately
-text/html;                         cha %s; nametemplate=%s.html; needsterminal
+text/html;                         cha -I UTF-8 %s; nametemplate=%s.html; needsterminal
 
 # This second one is chosen by auto_view due to the copiousoutput tag
-text/html;                         cha -d -T text/html; copiousoutput
+text/html;                         cha -d -I UTF-8 -T text/html; copiousoutput
 
 # The third, non-existent one is going in to view the attachments,
 # then press 'V' on the text/html attachment, which opens in a proper browser
