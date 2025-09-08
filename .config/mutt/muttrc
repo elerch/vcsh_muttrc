@@ -72,6 +72,14 @@ set query_command = "echo %s | xargs khard email --parsable --search-in-source-f
 bind editor <Tab> complete-query
 bind editor ^T    complete
 
+# We can use , as a leader for commands
+unbind index ,
+bind index , noop
+
+macro index ,t '<enter-command>set sort=threads<enter>' "Sort by threads"
+macro index ,d '<enter-command>set sort=reverse-date-received<enter>' "Sort by reverse date"
+
+
 macro index \Cf "<enter-command>unset wait_key<enter><shell-escape>printf 'Enter a search term to find with notmuch: '; read x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch-remote search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;s/\^id:// for@a;$,=\"|\";print@a' | perl -le '@a=<>; chomp@a; s/\\+/\\\\+/ for@a;print@a' \`\"<enter>" "show only messages matching a notmuch pattern"
 macro index A "<limit>all\n" "show all messages (undo limit)"
 macro attach 'V' "<pipe-entry>iconv -c --to-code=UTF8 > ~/.cache/mutt-mail.html<enter><shell-escape>open ~/.cache/mutt-mail.html<enter>"
