@@ -9,6 +9,6 @@ text/html;                         cha -d -I UTF-8 -T text/html; copiousoutput
 # The third, non-existent one is going in to view the attachments,
 # then press 'V' on the text/html attachment, which opens in a proper browser
 
-# Open images with img2sixel (TODO: deal with kitty)
-image/*; (clear && img2sixel %s); needsterminal
+# Open images with viu
+image/*; (clear && viu %s); needsterminal
 application/pdf;                   xdg-open %s; copiousoutput
