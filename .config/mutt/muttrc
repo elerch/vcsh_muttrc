@@ -82,7 +82,14 @@ macro index ,t '<enter-command>set sort=threads<enter>' "Sort by threads"
 macro index ,d '<enter-command>set sort=reverse-date-received<enter>' "Sort by reverse date"
 
 
-macro index \Cf "<enter-command>unset wait_key<enter><shell-escape>printf 'Enter a search term to find with notmuch: '; read x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch-remote search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;s/\^id:// for@a;$,=\"|\";print@a' | perl -le '@a=<>; chomp@a; s/\\+/\\\\+/ for@a;print@a' \`\"<enter>" "show only messages matching a notmuch pattern"
+# Old ssh-based, using notmuch cli. Keeping here because it is standard and doesn't
+# require the use of https://git.lerch.org/lobo/zetviel
+# macro index \Cf "<enter-command>unset wait_key<enter><shell-escape>printf 'Enter a search term to find with notmuch: '; read x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`notmuch-remote search --output=messages \$(cat ~/.cache/mutt_terms) | head -n 600 | perl -le '@a=<>;s/\^id:// for@a;$,=\"|\";print@a' | perl -le '@a=<>; chomp@a; s/\\+/\\\\+/ for@a;print@a' \`\"<enter>" "show only messages matching a notmuch pattern"
+
+# Based on new netviel implementation (https://git.lerch.org/lobo/zetviel).
+# note that ~/.netrc is being used here for authentication by curl
+macro index \Cf "<enter-command>unset wait_key<enter><shell-escape>printf 'Enter a search term to find with notmuch: '; read x; echo \$x >~/.cache/mutt_terms<enter><limit>~i \"\`curl -s -n -H 'Accept: text/plain; format=message-ids; separator=|; escape=mutt' https://netviel.lerch.org/api/query/\$(cat ~/.cache/mutt_terms)\`\"<enter>" "show only messages matching a notmuch pattern"
+
 macro index A "<limit>all\n" "show all messages (undo limit)"
 macro attach 'V' "<pipe-entry>iconv -c --to-code=UTF8 > ~/.cache/mutt-mail.html<enter><shell-escape>open ~/.cache/mutt-mail.html<enter>"
 ## This configuration relies on NerdFonts being installed and in use
