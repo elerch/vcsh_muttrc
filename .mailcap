@@ -12,3 +12,9 @@ text/html;                         cha -d -I UTF-8 -T text/html; copiousoutput
 # Open images with viu
 image/*; (clear && viu %s); needsterminal
 application/pdf;                   xdg-open %s; copiousoutput
+
+# Open calendar invites by pulling into khal
+text/calendar; (clear && khal import %s --batch && echo 'event imported'); needsterminal
+
+# Opendoc spreadsheet
+application/vnd.oasis.opendocument.spreadsheet; xdg-open %s; copiousoutput
