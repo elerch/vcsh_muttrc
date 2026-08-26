@@ -17,7 +17,6 @@ set spoolfile = '+Inbox'
 set postponed = '+[Gmail]/Drafts'
 set record = '+[Gmail]/Sent Mail'
 unset record # Gmail automatically saves sent e-mail to +[Gmail]/Sent, so we do not want duplicates
-set trash = '+[Gmail]/Trash'
 set ssl_force_tls = yes
 set sendmail = "sendemail"
 unset record
@@ -26,6 +25,14 @@ unset record
 set record = '=Inbox/.Sent'
 set trash = '=Inbox/.Trash'
 set postponed = '=Inbox/.Drafts'
+
+# Deletes become a maildir 'T' flag rename, never an unlink().
+# Guards against neomutt marking messages deleted when syncthing
+# renames files underneath a long-running session. This makes the
+# $trash setting above inert -- see trash_append() in mx.c -- which
+# is intentional; $trash cannot protect against this failure mode
+# because the code path that causes it sets Email.purge.
+set maildir_trash = yes
 
 # Where to put the stuff
 set header_cache     = ~/.mutt/cache/headers # store headers
