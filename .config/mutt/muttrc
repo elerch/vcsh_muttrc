@@ -12,7 +12,7 @@ timeout-hook 'exec sync-mailbox'
 # My mailboxes
 # set folder = 'imaps://imap.gmail.com:993'
 set mbox_type=Maildir
-set folder = "~/Mail/gmail"
+set folder = "~/Mail/lerch.org"
 set spoolfile = '+Inbox'
 set postponed = '+[Gmail]/Drafts'
 set record = '+[Gmail]/Sent Mail'
