@@ -14,17 +14,29 @@ timeout-hook 'exec sync-mailbox'
 set mbox_type=Maildir
 set folder = "~/Mail/lerch.org"
 set spoolfile = '+Inbox'
-set postponed = '+[Gmail]/Drafts'
-set record = '+[Gmail]/Sent Mail'
-unset record # Gmail automatically saves sent e-mail to +[Gmail]/Sent, so we do not want duplicates
 set ssl_force_tls = yes
 set sendmail = "sendemail"
-unset record
 
-# Move these folders outside of gmail
+# Sent/Drafts/Trash live under Inbox/, not in the [Gmail]/ tree that mbsync
+# pulls down.
 set record = '=Inbox/.Sent'
 set trash = '=Inbox/.Trash'
 set postponed = '=Inbox/.Drafts'
+
+# Declared mailboxes. Feeds the browser's mailbox-list view (c then ? then
+# <Tab>), <Space> cycling at the <change-folder> prompt, and the sidebar.
+#
+# <Space>/<mailbox-cycle> only visits mailboxes with NEW MAIL, so it never
+# reaches Sent or Trash. Use the ,i/,r/,s/,j/,x macros further down instead.
+#
+# <Tab> at the folder prompt is NOT mailbox-name completion, it is plain
+# filename completion -- and it is rebound to complete-query below, so ^T is
+# the path-completion key in this config.
+named-mailboxes "Inbox"  "+Inbox" \
+                "Drafts" "+Inbox/.Drafts" \
+                "Sent"   "+Inbox/.Sent" \
+                "Junk"   "+Inbox/.Junk" \
+                "Trash"  "+Inbox/.Trash"
 
 # Deletes become a maildir 'T' flag rename, never an unlink().
 # Guards against neomutt marking messages deleted when syncthing
@@ -33,6 +45,10 @@ set postponed = '=Inbox/.Drafts'
 # is intentional; $trash cannot protect against this failure mode
 # because the code path that causes it sets Email.purge.
 set maildir_trash = yes
+
+# Safety net: re-assert the guard on every folder change, so an interrupted
+# macro can never leave maildir_trash off for long.
+folder-hook . 'set maildir_trash=yes'
 
 # Where to put the stuff
 set header_cache     = ~/.mutt/cache/headers # store headers
@@ -43,6 +59,11 @@ set message_cachedir = ~/.mutt/cache/bodies  # store bodies
 # Other
 source mutt-colors-solarized-dark-256.muttrc
 # source other-colors.muttrc
+
+# Spam tagged by rspamd (X-Spam: Yes); must follow the theme, last match wins
+color index color97  color234 "~h '^X-Spam: Yes'"       # spam, unread
+color index color61  color234 "~h '^X-Spam: Yes' ~R"    # spam, read
+color index color235 color160 "~D"                      # keep deleted visible
 set read_inc=1000
 set write_inc=1000
 set sort=threads
@@ -84,9 +105,37 @@ bind editor ^T    complete
 # We can use , as a leader for commands
 unbind index ,
 bind index , noop
+bind pager , noop
 
 macro index ,t '<enter-command>set sort=threads<enter>' "Sort by threads"
 macro index ,d '<enter-command>set sort=reverse-date-received<enter>' "Sort by reverse date"
+
+# Folder jumps. Needed because <Space>/<mailbox-cycle> only visits mailboxes
+# with new mail, so it can never reach Sent or Trash.
+macro index,pager ,i "<change-folder>+Inbox<enter>"         "go to Inbox"
+macro index,pager ,r "<change-folder>+Inbox/.Drafts<enter>" "go to Drafts"
+macro index,pager ,s "<change-folder>+Inbox/.Sent<enter>"   "go to Sent"
+macro index,pager ,j "<change-folder>+Inbox/.Junk<enter>"   "go to Junk"
+macro index,pager ,x "<change-folder>+Inbox/.Trash<enter>"  "go to Trash"
+
+# Sweep deleted messages into the Trash.
+#
+# d only marks a message: maildir_trash=yes turns the delete into a 'T' flag
+# rename, so it stays put and shows red, and $trash is inert. ,X lifts the
+# guard for exactly one <sync-mailbox>, which is when $trash does the actual
+# move into =Inbox/.Trash, then puts the guard straight back.
+#
+# It also sets delete=yes for the same window. That is deliberate: a
+# confirmation prompt fired from inside a macro competes with the macro's own
+# remaining keystrokes, and testing showed that leaves the restore unreliable.
+# Leaving maildir_trash off is a far worse failure than an unconfirmed sweep,
+# because the syncthing race it guards against destroys mail outright (it sets
+# Email.purge, which bypasses $trash). The d presses are the confirmation, and
+# a mistaken ,X is recoverable since everything lands in .Trash.
+#
+# Inside .Trash itself deletes are real, per the $trash docs, so ,X doubles as
+# "empty the trash".
+macro index ,X "<enter-command>set maildir_trash=no delete=yes<enter><sync-mailbox><enter-command>set maildir_trash=yes delete=ask-yes<enter>" "move deleted messages to Trash"
 
 
 # Old ssh-based, using notmuch cli. Keeping here because it is standard and doesn't
