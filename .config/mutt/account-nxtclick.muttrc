@@ -1,0 +1,18 @@
+# Identity and folders for emil@nxtclick.ai (Google Workspace). Sourced by
+# folder-hook for anything under ~/Mail/nxtclick. Synced two-way by mbsync on
+# nas2; sending goes through the same msmtp queue, and msmtp on nas2 picks its
+# nxtclick (smtp.gmail.com) account from the envelope-from.
+set from = 'emil@nxtclick.ai'
+set hostname = 'nxtclick.ai'
+
+# Gmail SMTP files a copy in [Gmail]/Sent Mail itself; a record would duplicate.
+unset record
+set postponed = '~/Mail/nxtclick/[Gmail]/Drafts'
+set trash = '~/Mail/nxtclick/[Gmail]/Trash'
+
+# Orange mailbox-description bubble so it is obvious which identity is active.
+# The trailing 1 colors only capture group 1: the rounded end caps either side
+# of the bubble, which must match its background.
+color status color234 color214 '📫=?[a-zA-Z0-9\/\. ]+'
+color status color214 default '()📫' 1
+color status color214 default '()​' 1

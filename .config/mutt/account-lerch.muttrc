@@ -1,0 +1,19 @@
+# Identity and folders for lobo@lerch.org. Sourced once from muttrc and again by
+# the catch-all folder-hook on every folder change; the nxtclick folder-hook is
+# declared after it, so it wins inside ~/Mail/nxtclick.
+set from = 'lobo@lerch.org'
+set hostname = 'mail.eler.ch'
+
+# Sent/Drafts/Trash live under Inbox/, not in the [Gmail]/ tree that mbsync
+# pulls down. '=' expands against $folder, which the hooks never change.
+set record = '=Inbox/.Sent'
+set postponed = '=Inbox/.Drafts'
+set trash = '=Inbox/.Trash'
+
+# Mailbox-description bubble in the status bar. Same regex as the one in
+# muttrc, so this re-colors that entry rather than adding another. The two
+# capture-group rules color just the rounded end caps either side of it; they
+# exist so account-nxtclick.muttrc has entries to re-color.
+color status color7 color241 '📫=?[a-zA-Z0-9\/\. ]+'
+color status color241 default '()📫' 1
+color status color241 default '()​' 1

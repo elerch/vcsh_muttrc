@@ -1,7 +1,5 @@
 # About Me
 set realname = 'Emil Lerch'
-set from = 'lobo@lerch.org'
-set hostname = 'mail.eler.ch'
 set message_id_format = '<%Y%02m%02d%02H%02M%02S.G%c%p@%f>'
 set use_from = yes
 set envelope_from = yes
@@ -17,11 +15,15 @@ set spoolfile = '+Inbox'
 set ssl_force_tls = yes
 set sendmail = "sendemail"
 
-# Sent/Drafts/Trash live under Inbox/, not in the [Gmail]/ tree that mbsync
-# pulls down.
-set record = '=Inbox/.Sent'
-set trash = '=Inbox/.Trash'
-set postponed = '=Inbox/.Drafts'
+# Accounts. lerch.org is the default identity (from, hostname, record,
+# postponed, trash); folder-hooks below swap in nxtclick under ~/Mail/nxtclick.
+# Must come after $folder is set: '=' paths expand against it.
+source ~/.config/mutt/account-lerch.muttrc
+
+# Replies go out from whichever of my addresses the message was sent to, and
+# envelope_from hands that to msmtp, which picks the matching account on nas2.
+alternates '^lobo@lerch\.org$' '^emil@nxtclick\.ai$'
+set reverse_name = yes
 
 # Declared mailboxes. Feeds the browser's mailbox-list view (c then ? then
 # <Tab>), <Space> cycling at the <change-folder> prompt, and the sidebar.
@@ -37,6 +39,11 @@ named-mailboxes "Inbox"  "+Inbox" \
                 "Sent"   "+Inbox/.Sent" \
                 "Junk"   "+Inbox/.Junk" \
                 "Trash"  "+Inbox/.Trash"
+named-mailboxes "nxtclick"  "~/Mail/nxtclick/Inbox" \
+                "nx Drafts" "~/Mail/nxtclick/[Gmail]/Drafts" \
+                "nx Sent"   "~/Mail/nxtclick/[Gmail]/Sent Mail" \
+                "nx Spam"   "~/Mail/nxtclick/[Gmail]/Spam" \
+                "nx Trash"  "~/Mail/nxtclick/[Gmail]/Trash"
 
 # Deletes become a maildir 'T' flag rename, never an unlink().
 # Guards against neomutt marking messages deleted when syncthing
@@ -49,6 +56,11 @@ set maildir_trash = yes
 # Safety net: re-assert the guard on every folder change, so an interrupted
 # macro can never leave maildir_trash off for long.
 folder-hook . 'set maildir_trash=yes'
+
+# Per-account identity. Order matters: the catch-all resets to lerch.org on
+# every folder change, then the more specific nxtclick hook overrides it.
+folder-hook . 'source ~/.config/mutt/account-lerch.muttrc'
+folder-hook '/Mail/nxtclick/' 'source ~/.config/mutt/account-nxtclick.muttrc'
 
 # Where to put the stuff
 set header_cache     = ~/.mutt/cache/headers # store headers
@@ -64,6 +76,18 @@ source mutt-colors-solarized-dark-256.muttrc
 color index color97  color234 "~h '^X-Spam: Yes'"       # spam, unread
 color index color61  color234 "~h '^X-Spam: Yes' ~R"    # spam, read
 color index color235 color160 "~D"                      # keep deleted visible
+
+# Sidebar. mail_check_stats is cheap for Maildir: a readdir plus filename flag
+# parse, no stat(), and the open mailbox is skipped. Leave maildir_check_cur
+# off: with mail_check_recent it stat()s every unread file in cur/ (126k+ in
+# Inbox). %Z is new/unseen, not %N unread, so Inbox doesn't show 126k.
+set mail_check_stats = yes
+set sidebar_visible = yes
+set sidebar_width = 24
+#set sidebar_divider_char = '|'
+set sidebar_divider_char = '│'
+set sidebar_format = '%D%* %?Z?%Z?'
+color sidebar_new color136 default
 set read_inc=1000
 set write_inc=1000
 set sort=threads
@@ -72,8 +96,8 @@ set date_format="%Y-%m-%d %H:%M"
 set index_format="%2C | %Z [%D] %-30.30F (%-4.4c) %s"
 set forward_format="Fwd: %s"
 set mime_forward=yes
-#set new_mail_command = "notify-send '%d' '%n new messages, %u unread'"
-set new_mail_command = "gdbus call --session --dest=org.freedesktop.Notifications --object-path=/org/freedesktop/Notifications --method=org.freedesktop.Notifications.Notify '' 0 '' 'New Mail Received' 'Total new messages: %n' '[]' '{\"urgency\": <1>}' 5000 > /dev/null"
+# Per-account new counts; %n here would only describe the current mailbox.
+set new_mail_command = "~/.config/mutt/notify-new-mail"
 set signature=""
 auto_view text/html
 
@@ -117,13 +141,17 @@ macro index,pager ,r "<change-folder>+Inbox/.Drafts<enter>" "go to Drafts"
 macro index,pager ,s "<change-folder>+Inbox/.Sent<enter>"   "go to Sent"
 macro index,pager ,j "<change-folder>+Inbox/.Junk<enter>"   "go to Junk"
 macro index,pager ,x "<change-folder>+Inbox/.Trash<enter>"  "go to Trash"
+macro index,pager ,n "<change-folder>~/Mail/nxtclick/Inbox<enter>" "go to nxtclick Inbox"
+macro index,pager ,b "<enter-command>toggle sidebar_visible<enter>" "toggle sidebar"
 
 # Sweep deleted messages into the Trash.
 #
 # d only marks a message: maildir_trash=yes turns the delete into a 'T' flag
 # rename, so it stays put and shows red, and $trash is inert. ,X lifts the
 # guard for exactly one <sync-mailbox>, which is when $trash does the actual
-# move into =Inbox/.Trash, then puts the guard straight back.
+# move into $trash (=Inbox/.Trash, or [Gmail]/Trash under nxtclick), then
+# puts the guard straight back. In nxtclick a bare d with no ,X archives the
+# message in Gmail at the next mbsync run.
 #
 # It also sets delete=yes for the same window. That is deliberate: a
 # confirmation prompt fired from inside a macro competes with the macro's own
@@ -155,7 +183,7 @@ macro attach 'V' "<pipe-entry>iconv -c --to-code=UTF8 > ~/.cache/mutt-mail.html<
 ifndef my_has_nerd finish # end here if we don't have nerd fonts installed
 # Default is:
 # "-%r-NeoMutt: %D [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%?T?%T/?%s/%S)-%>-(%P)---"
-set status_format = "%r 📫%D %?u? %u ?%?R?󰇯 %R ?%?d? %d ?%?t? %t ?%?F? %F ?%?p? %p? \n  \n"
+set status_format = "%r 📫%D​ %?u? %u ?%?R?󰇯 %R ?%?d? %d ?%?t? %t ?%?F? %F ?%?p? %p? \n  \n"
 
 # This is the default. Pager format is what you see when looking at the mail message
 # set pager_format = "-%Z- %C/%m: %-20.20n   %s%*  -- (%P)"
