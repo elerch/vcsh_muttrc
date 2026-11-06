@@ -1,0 +1,22 @@
+#!/bin/sh
+# neomutt $new_mail_command: one desktop notification listing new mail per
+# account. Counts files in each account's Inbox/new; arrivals land there and
+# neomutt moves them to cur/ once the mailbox is opened.
+
+nl='\n'
+body=""
+for acct in lerch.org nxtclick; do
+  dir="$HOME/Mail/$acct/Inbox/new"
+  [ -d "$dir" ] || continue
+  n=$(find "$dir" -mindepth 1 -maxdepth 1 -type f | wc -l)
+  [ "$n" -gt 0 ] || continue
+  body="${body}${body:+$nl}$acct: $n new"
+done
+
+[ -n "$body" ] || exit 0
+
+# Body is passed as a quoted GVariant string so the \n escapes become newlines.
+exec gdbus call --session --dest=org.freedesktop.Notifications \
+  --object-path=/org/freedesktop/Notifications \
+  --method=org.freedesktop.Notifications.Notify \
+  '' 0 '' 'New Mail Received' "'$body'" '[]' '{"urgency": <1>}' 5000 > /dev/null
